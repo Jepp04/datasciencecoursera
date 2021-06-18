@@ -1,0 +1,116 @@
+---
+title: "Exponential distribution in R vs the Central Limit Theorem"
+author: "Ulrich van Staden"
+date: "18/06/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+devtools::install_github("haozhu233/kableExtra")
+```
+
+## Overview
+This report demonstrates the differences and similarities between theoretical and simulated results of an exponential distribution. The results to be compared are the mean, variance and standard deviation. First the exponential distribution was generated  through using a 1000 random exponential values. Then the mean distribution were generated through the use of averages of 40 random exponentials generated, of which shows that the distribution tends to approximate a normal distribution.
+
+## Simulations
+The following theoretical parameters were given:
+
+* **Rate** = lambda = 0.2 
+* **Mean** = 1/lambda = 5
+* **Number of simulation** = 1000
+* **Number of exponentials** = 40
+
+The parameters listed above were used to plot 2 graphs: an **Exponential distribution** with a 1000 exponentials and a **Mean distribution** generated through a 1000 simulations of averages from 40 exponential distributions. These simulations have been simulated in R programming.
+
+### Exponential Distribution
+```{r echo=TRUE}
+n = 1000 #Number of observations
+lambda = 0.2 # Rate parameter
+Expo1000 = rexp(n,lambda) # Generates a 1000 random exponential values.
+medianExp = median(Expo1000)
+meanExp = mean(Expo1000)
+# Plot these values on a histogram.
+hist(Expo1000
+     ,main="Histogram on a 1000 Random Generated Exponetial Values"
+     ,xlab="Value"
+     ,breaks=1000)
+abline(v = medianExp, col = "blue", lwd = 4) # Draws a line presenting the median of the distribution.
+abline(v = meanExp, col = "red", lwd = 4,) # Draws a line presenting the mean of the distribution.
+```
+
+The graph above demonstrates the frequency of the exponential values generated. The red line represents the mean = `r meanExp` and the blue line represents the median = `r medianExp`, which indicates that half of the generated values are below 3.5 and that most of the exponentials are below approximately 5.
+
+### Mean Distribution
+```{r echo=TRUE}
+n<-40 #Number of observations
+lambda <- 0.2 # Rate parameter
+Expo1000 = NULL
+
+# Generates a 1000 random averages from 40 random generated exponential values.
+for (i in 1 : 1000) Expo1000 = c(Expo1000, mean(rexp(n,lambda)))
+medianExp = median(Expo1000)
+meanExp = mean(Expo1000)
+hist(Expo1000
+     ,main="Histogram on a 1000 Simulations on Averages of 40 Exponetial Values"
+     ,xlab="Average/Mean"
+     ,breaks=40)
+abline(v = medianExp, col = "blue", lwd = 4) # Draws a line presenting the median of the distribution.
+abline(v = meanExp, col = "red", lwd = 4,) # Draws a line presenting the mean of the distribution.
+```
+
+The graph above demonstrates the mean frequency of the random exponential values generated. The red line represents the mean = `r meanExp` and the blue line represents the median = `r medianExp`. As you can see the median and the mean of this distribution are quite close and this is due to the average taken of from every 40 exponential values generated.
+
+## Sample Mean versus Theoretical Mean
+
+```{R echo=TRUE}
+# Sample mean of the simulation
+SampleMean = mean(Expo1000)
+#Theoretical Mean of the simulation
+TheoreticalMean = 1/lambda
+#Confidence Interval of the simulation, base on 95% confidence
+ConfidenceInterval = t.test(Expo1000)$conf.int
+```
+
+::: l-body-outset
+|Parameters         | Simulation     | Theoretical          | Confidence Interval   |
+|:------------------|:----------------:|:----------------------:|:-----------------------:|
+| Mean              | `r SampleMean` |  `r TheoreticalMean` | `r ConfidenceInterval`|
+:::
+The mean is quite similar between the theoretical mean and the simulated mean and the theoretical mean is contained within the confidence interval.
+
+## Sample Variance versus Theoretical Variance
+
+```{R echo=TRUE}
+# Sample Standard Deviation of the simulation
+SampleStadard = sd(Expo1000)
+#Theoretical Standard Deviation of the simulation
+TheoreticalStandard = (1/lambda)/sqrt(n)
+# Sample Variance of the simulation
+SampleVar = var(Expo1000)
+#Theoretical Variance of the simulation
+TheoreticalVar = (1/lambda)^2/n
+```
+
+::: l-body-outset
+|Parameters         | Simulation       | Theoretical             |
+|:------------------|:----------------:|:-----------------------:|
+| Standard Deviation| `r SampleStadard`| `r TheoreticalStandard` | 
+| Variance          | `r SampleVar`    | `r TheoreticalVar`      | 
+:::
+
+Both the standard deviation and the variance are quite similar between the theoretical results and the simulated results. 
+### Distribution
+```{r}
+# Plots the mean distribution.
+hist(Expo1000
+     ,main="Histogram on a 1000 Simulations on Averages of 40 Exponetial Values"
+     ,xlab="Average/Mean"
+     ,prob=TRUE
+     ,breaks = 40)
+lines(density(Expo1000), col = "green", lwd = 4) # Plots a line tracing an aproximation to a normal distribution.
+abline(v = medianExp, col = "blue", lwd = 4) # Draws a line presenting the median of the distribution.
+abline(v = meanExp, col = "red", lwd = 4,) # Draws a line presenting the mean of the distribution.
+```
+
+The same mean distribution is plotted above as in the simulations section with one extra line (green) indicating the approximation to a normal distribution. As the number of samples or simulation increase so will the normaility of the distribution become more normal.
